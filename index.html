@@ -1,0 +1,499 @@
+<title>Quanto Sobra</title>
+<style>
+  :root {
+    --bg: #F2F5F1;
+    --surface: #FFFFFF;
+    --surface-2: #E7ECE6;
+    --border: #D6DED4;
+    --text: #17211A;
+    --text-muted: #5B6C60;
+    --accent: #1F7A5C;
+    --accent-bg: #E1F0E8;
+    --accent-strong: #12503B;
+    --warn: #8B4049;
+    --warn-bg: #F5E7E6;
+    --focus: #1F7A5C;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #10150F;
+      --surface: #181F17;
+      --surface-2: #212A1F;
+      --border: #303B2C;
+      --text: #E9F0E5;
+      --text-muted: #93A68F;
+      --accent: #52C696;
+      --accent-bg: #17352A;
+      --accent-strong: #7EDCB2;
+      --warn: #D08D93;
+      --warn-bg: #3A2224;
+      --focus: #52C696;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #10150F;
+    --surface: #181F17;
+    --surface-2: #212A1F;
+    --border: #303B2C;
+    --text: #E9F0E5;
+    --text-muted: #93A68F;
+    --accent: #52C696;
+    --accent-bg: #17352A;
+    --accent-strong: #7EDCB2;
+    --warn: #D08D93;
+    --warn-bg: #3A2224;
+    --focus: #52C696;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Work Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 28px 16px 64px;
+  }
+
+  .page {
+    max-width: 440px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  h1 {
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 26px;
+    font-weight: 600;
+    margin: 0;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+
+  .hero {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 24px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .hero-label {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .hero-figure {
+    font-family: "Fraunces", Georgia, serif;
+    font-variation-settings: "opsz" 90;
+    font-weight: 600;
+    font-size: 44px;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+    text-wrap: balance;
+    min-height: 48px;
+    display: flex;
+    align-items: baseline;
+  }
+
+  .hero-figure.negative { color: var(--warn); }
+  .hero-figure.empty { color: var(--text-muted); font-size: 18px; font-family: "Work Sans", sans-serif; font-weight: 500; }
+
+  .hero-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .bar {
+    display: flex;
+    height: 10px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+  }
+
+  .bar-seg-save { background: var(--accent); height: 100%; transition: flex-basis 120ms ease; }
+  .bar-seg-spend { background: var(--surface-2); height: 100%; }
+
+  .bar-legend {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; }
+  .dot-save { background: var(--accent); }
+  .dot-spend { background: var(--border); }
+
+  section.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 20px 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .field-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .salary-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 14px;
+  }
+
+  .currency {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 22px;
+    color: var(--text-muted);
+  }
+
+  #salary {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 26px;
+    font-variant-numeric: tabular-nums;
+    outline: none;
+    padding: 2px 0;
+  }
+
+  #salary::placeholder { color: var(--text-muted); opacity: 0.6; }
+
+  .section-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  .section-title h2 {
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .section-title .total {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 14px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  #expenses {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .expense-row {
+    display: grid;
+    grid-template-columns: 1fr 96px 32px;
+    gap: 8px;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .expense-row:last-of-type { border-bottom: none; }
+
+  .expense-row input[type="text"] {
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-family: "Work Sans", sans-serif;
+    font-size: 15px;
+    outline: none;
+    min-width: 0;
+    padding: 4px 2px;
+    border-radius: 6px;
+  }
+
+  .expense-row .value-wrap {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 3px;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .expense-row .value-wrap span {
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  .expense-row input[type="number"] {
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    width: 100%;
+    outline: none;
+    padding: 4px 2px;
+    border-radius: 6px;
+    -moz-appearance: textfield;
+  }
+  .expense-row input[type="number"]::-webkit-outer-spin-button,
+  .expense-row input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .expense-row input:focus-visible {
+    box-shadow: 0 0 0 2px var(--focus);
+  }
+
+  .remove-btn {
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .remove-btn:hover { background: var(--warn-bg); color: var(--warn); }
+  .remove-btn:focus-visible { box-shadow: 0 0 0 2px var(--focus); }
+
+  .add-btn {
+    align-self: flex-start;
+    border: 1px dashed var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: "Work Sans", sans-serif;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+  .add-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .add-btn:focus-visible { box-shadow: 0 0 0 2px var(--focus); }
+
+  footer {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
+    padding-top: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bar-seg-save { transition: none; }
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+<div class="page">
+  <header>
+    <span class="eyebrow">Orçamento pessoal · mensal</span>
+    <h1>Quanto sobra este mês</h1>
+  </header>
+
+  <div class="hero">
+    <div class="hero-label">Poupança estimada</div>
+    <div class="hero-figure empty" id="heroFigure">Introduz o ordenado abaixo</div>
+    <div class="hero-sub" id="heroSub"></div>
+    <div class="bar"><div class="bar-seg-save" id="barSave" style="flex-basis:0%"></div><div class="bar-seg-spend" id="barSpend" style="flex-basis:100%"></div></div>
+    <div class="bar-legend">
+      <span><span class="dot dot-save"></span>poupas</span>
+      <span><span class="dot dot-spend"></span>gastas</span>
+    </div>
+  </div>
+
+  <section class="card">
+    <div class="field-label">Ordenado líquido</div>
+    <div class="salary-row">
+      <span class="currency">€</span>
+      <input type="number" id="salary" inputmode="decimal" placeholder="ex: 1450" min="0" step="1">
+    </div>
+
+    <div class="section-title">
+      <h2>Despesas fixas</h2>
+      <span class="total" id="expenseTotal">€ 0</span>
+    </div>
+    <div id="expenses"></div>
+    <button class="add-btn" id="addRow" type="button">+ adicionar despesa</button>
+  </section>
+
+  <footer>guardado automaticamente neste telemóvel</footer>
+</div>
+
+<script>
+(function () {
+  var STORAGE_KEY = "quanto-sobra-v1";
+  var expensesEl = document.getElementById("expenses");
+  var salaryEl = document.getElementById("salary");
+  var addRowBtn = document.getElementById("addRow");
+  var heroFigure = document.getElementById("heroFigure");
+  var heroSub = document.getElementById("heroSub");
+  var expenseTotalEl = document.getElementById("expenseTotal");
+  var barSave = document.getElementById("barSave");
+  var barSpend = document.getElementById("barSpend");
+
+  var defaultExpenses = [
+    { name: "Casa", value: 360 },
+    { name: "Carro", value: 377 },
+    { name: "Gasóleo + portagens", value: 250 },
+    { name: "Spotify", value: 17 },
+    { name: "Barbeiro", value: 20 },
+    { name: "Cofre conjunto Sofia", value: 100 },
+    { name: "Vila", value: 100 },
+    { name: "Dinheiro para o mês", value: 100 }
+  ];
+
+  var rowSeq = 0;
+
+  function money(n) {
+    return "€ " + n.toLocaleString("pt-PT", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  }
+
+  function loadState() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (e) { return null; }
+  }
+
+  function saveState() {
+    try {
+      var rows = Array.prototype.slice.call(expensesEl.querySelectorAll(".expense-row")).map(function (row) {
+        return {
+          name: row.querySelector('input[type="text"]').value,
+          value: parseFloat(row.querySelector('input[type="number"]').value) || 0
+        };
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        salary: parseFloat(salaryEl.value) || 0,
+        rows: rows
+      }));
+    } catch (e) { /* localStorage indisponível, ignora */ }
+  }
+
+  function addRow(name, value) {
+    rowSeq += 1;
+    var id = "exp-" + rowSeq;
+    var row = document.createElement("div");
+    row.className = "expense-row";
+    row.innerHTML =
+      '<input type="text" id="' + id + '-name" value="' + escapeHtml(name || "") + '" placeholder="nome da despesa">' +
+      '<div class="value-wrap"><span>€</span><input type="number" id="' + id + '-value" value="' + (value || "") + '" min="0" step="1" inputmode="decimal"></div>' +
+      '<button class="remove-btn" type="button" aria-label="remover despesa">×</button>';
+
+    row.querySelector(".remove-btn").addEventListener("click", function () {
+      row.remove();
+      recalc();
+    });
+    row.querySelectorAll("input").forEach(function (inp) {
+      inp.addEventListener("input", recalc);
+    });
+    expensesEl.appendChild(row);
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function recalc() {
+    var total = 0;
+    expensesEl.querySelectorAll(".expense-row").forEach(function (row) {
+      total += parseFloat(row.querySelector('input[type="number"]').value) || 0;
+    });
+    expenseTotalEl.textContent = money(total);
+
+    var salary = parseFloat(salaryEl.value);
+    if (!salary || salary <= 0) {
+      heroFigure.textContent = "Introduz o ordenado abaixo";
+      heroFigure.classList.add("empty");
+      heroFigure.classList.remove("negative");
+      heroSub.textContent = "";
+      barSave.style.flexBasis = "0%";
+      barSpend.style.flexBasis = "100%";
+      saveState();
+      return;
+    }
+
+    heroFigure.classList.remove("empty");
+    var savings = salary - total;
+    var pct = Math.max(0, Math.min(100, (savings / salary) * 100));
+    var spendPct = Math.max(0, Math.min(100, (total / salary) * 100));
+
+    if (savings < 0) {
+      heroFigure.textContent = "− " + money(Math.abs(savings));
+      heroFigure.classList.add("negative");
+      heroSub.textContent = "gastas mais " + Math.round((Math.abs(savings) / salary) * 100) + "% do que ganhas";
+      barSave.style.flexBasis = "0%";
+      barSpend.style.flexBasis = "100%";
+    } else {
+      heroFigure.textContent = money(savings);
+      heroFigure.classList.remove("negative");
+      heroSub.textContent = Math.round(pct) + "% do ordenado, depois de " + money(total) + " de despesas";
+      barSave.style.flexBasis = pct + "%";
+      barSpend.style.flexBasis = spendPct + "%";
+    }
+
+    saveState();
+  }
+
+  addRowBtn.addEventListener("click", function () {
+    addRow("", "");
+    recalc();
+  });
+  salaryEl.addEventListener("input", recalc);
+
+  var saved = loadState();
+  if (saved && saved.rows && saved.rows.length) {
+    saved.rows.forEach(function (r) { addRow(r.name, r.value); });
+    if (saved.salary) salaryEl.value = saved.salary;
+  } else {
+    defaultExpenses.forEach(function (r) { addRow(r.name, r.value); });
+  }
+  recalc();
+})();
+</script>
