@@ -1,3 +1,8 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Quanto Sobra</title>
 <style>
   :root {
@@ -10,6 +15,8 @@
     --accent: #1F7A5C;
     --accent-bg: #E1F0E8;
     --accent-strong: #12503B;
+    --paid-bg: #D3EBDD;
+    --paid-border: #A9D4BC;
     --warn: #8B4049;
     --warn-bg: #F5E7E6;
     --focus: #1F7A5C;
@@ -17,6 +24,7 @@
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
+      color-scheme: dark;
       --bg: #10150F;
       --surface: #181F17;
       --surface-2: #212A1F;
@@ -26,6 +34,8 @@
       --accent: #52C696;
       --accent-bg: #17352A;
       --accent-strong: #7EDCB2;
+      --paid-bg: #1A3A2C;
+      --paid-border: #2B5A44;
       --warn: #D08D93;
       --warn-bg: #3A2224;
       --focus: #52C696;
@@ -33,6 +43,7 @@
   }
 
   :root[data-theme="dark"] {
+    color-scheme: dark;
     --bg: #10150F;
     --surface: #181F17;
     --surface-2: #212A1F;
@@ -42,6 +53,8 @@
     --accent: #52C696;
     --accent-bg: #17352A;
     --accent-strong: #7EDCB2;
+    --paid-bg: #1A3A2C;
+    --paid-border: #2B5A44;
     --warn: #D08D93;
     --warn-bg: #3A2224;
     --focus: #52C696;
@@ -61,14 +74,10 @@
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: 24px;
   }
 
-  header {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
+  header { display: flex; flex-direction: column; gap: 4px; }
 
   .eyebrow {
     font-family: "IBM Plex Mono", ui-monospace, monospace;
@@ -87,6 +96,42 @@
     letter-spacing: -0.01em;
   }
 
+  .sync {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .sync-status {
+    font-size: 12px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .sync-status .led { width: 7px; height: 7px; border-radius: 50%; background: var(--border); flex: none; }
+  .sync-status.ok .led { background: var(--accent); }
+  .sync-status.busy .led { background: var(--text-muted); }
+  .sync-status.stale { color: var(--warn); }
+  .sync-status.stale .led { background: var(--warn); }
+
+  .sync-btn {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-family: "Work Sans", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  .sync-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .sync-btn:focus-visible { box-shadow: 0 0 0 2px var(--focus); outline: none; }
+  .sync-btn:disabled { opacity: 0.6; cursor: default; }
+
   .hero {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -97,10 +142,7 @@
     gap: 14px;
   }
 
-  .hero-label {
-    font-size: 13px;
-    color: var(--text-muted);
-  }
+  .hero-label { font-size: 13px; color: var(--text-muted); }
 
   .hero-figure {
     font-family: "Fraunces", Georgia, serif;
@@ -111,19 +153,14 @@
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.02em;
     color: var(--accent);
-    text-wrap: balance;
     min-height: 48px;
     display: flex;
     align-items: baseline;
   }
-
   .hero-figure.negative { color: var(--warn); }
   .hero-figure.empty { color: var(--text-muted); font-size: 18px; font-family: "Work Sans", sans-serif; font-weight: 500; }
 
-  .hero-sub {
-    font-size: 13px;
-    color: var(--text-muted);
-  }
+  .hero-sub { font-size: 13px; color: var(--text-muted); }
 
   .bar {
     display: flex;
@@ -133,7 +170,6 @@
     background: var(--surface-2);
     border: 1px solid var(--border);
   }
-
   .bar-seg-save { background: var(--accent); height: 100%; transition: flex-basis 120ms ease; }
   .bar-seg-spend { background: var(--surface-2); height: 100%; }
 
@@ -144,16 +180,32 @@
     color: var(--text-muted);
     font-variant-numeric: tabular-nums;
   }
-
   .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; }
   .dot-save { background: var(--accent); }
   .dot-spend { background: var(--border); }
+
+  .paid-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  .paid-summary div { display: flex; flex-direction: column; gap: 2px; }
+  .paid-summary .k { font-size: 12px; color: var(--text-muted); }
+  .paid-summary .v {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 16px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .paid-summary .v.done { color: var(--accent); }
 
   section.card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 18px;
-    padding: 20px 20px 16px;
+    padding: 20px 16px 16px;
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -164,6 +216,7 @@
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.06em;
+    padding: 0 4px;
   }
 
   .salary-row {
@@ -171,14 +224,10 @@
     align-items: baseline;
     gap: 8px;
     border-bottom: 1px solid var(--border);
-    padding-bottom: 14px;
+    padding: 0 4px 14px;
   }
 
-  .currency {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 22px;
-    color: var(--text-muted);
-  }
+  .currency { font-family: "IBM Plex Mono", monospace; font-size: 22px; color: var(--text-muted); }
 
   #salary {
     flex: 1;
@@ -192,22 +241,16 @@
     outline: none;
     padding: 2px 0;
   }
-
   #salary::placeholder { color: var(--text-muted); opacity: 0.6; }
 
   .section-title {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
+    gap: 8px;
+    padding: 0 4px;
   }
-
-  .section-title h2 {
-    font-family: "Fraunces", Georgia, serif;
-    font-size: 17px;
-    font-weight: 600;
-    margin: 0;
-  }
-
+  .section-title h2 { font-family: "Fraunces", Georgia, serif; font-size: 17px; font-weight: 600; margin: 0; }
   .section-title .total {
     font-family: "IBM Plex Mono", monospace;
     font-size: 14px;
@@ -215,21 +258,43 @@
     font-variant-numeric: tabular-nums;
   }
 
-  #expenses {
-    display: flex;
-    flex-direction: column;
-  }
+  #expenses { display: flex; flex-direction: column; gap: 6px; }
 
   .expense-row {
     display: grid;
-    grid-template-columns: 1fr 96px 32px;
-    gap: 8px;
+    grid-template-columns: 30px 1fr 88px 30px;
+    gap: 6px;
     align-items: center;
-    padding: 9px 0;
-    border-bottom: 1px solid var(--border);
+    padding: 6px 4px;
+    border: 1px solid transparent;
+    border-bottom-color: var(--border);
+    border-radius: 12px;
+    transition: background-color 120ms ease, border-color 120ms ease;
   }
+  .expense-row.paid {
+    background: var(--paid-bg);
+    border-color: var(--paid-border);
+  }
+  .expense-row.paid input[type="text"] { color: var(--accent-strong); }
+  .expense-row.paid .value-wrap span,
+  .expense-row.paid input[type="number"] { color: var(--accent-strong); }
 
-  .expense-row:last-of-type { border-bottom: none; }
+  .check {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    color: transparent;
+  }
+  .check svg { width: 14px; height: 14px; }
+  .expense-row.paid .check { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+  .check:focus-visible { box-shadow: 0 0 0 2px var(--focus); outline: none; }
 
   .expense-row input[type="text"] {
     border: none;
@@ -250,11 +315,7 @@
     gap: 3px;
     font-family: "IBM Plex Mono", monospace;
   }
-
-  .expense-row .value-wrap span {
-    color: var(--text-muted);
-    font-size: 13px;
-  }
+  .expense-row .value-wrap span { color: var(--text-muted); font-size: 13px; }
 
   .expense-row input[type="number"] {
     border: none;
@@ -271,14 +332,8 @@
     -moz-appearance: textfield;
   }
   .expense-row input[type="number"]::-webkit-outer-spin-button,
-  .expense-row input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-
-  .expense-row input:focus-visible {
-    box-shadow: 0 0 0 2px var(--focus);
-  }
+  .expense-row input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .expense-row input:focus-visible { box-shadow: 0 0 0 2px var(--focus); }
 
   .remove-btn {
     border: none;
@@ -287,18 +342,26 @@
     font-size: 18px;
     line-height: 1;
     cursor: pointer;
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
   }
   .remove-btn:hover { background: var(--warn-bg); color: var(--warn); }
-  .remove-btn:focus-visible { box-shadow: 0 0 0 2px var(--focus); }
+  .remove-btn:focus-visible { box-shadow: 0 0 0 2px var(--focus); outline: none; }
 
-  .add-btn {
-    align-self: flex-start;
+  .card-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 4px 4px 0;
+  }
+
+  .add-btn, .reset-btn {
     border: 1px dashed var(--border);
     background: transparent;
     color: var(--text-muted);
@@ -307,31 +370,80 @@
     padding: 8px 14px;
     border-radius: 10px;
     cursor: pointer;
-    margin-top: 4px;
   }
   .add-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .add-btn:focus-visible { box-shadow: 0 0 0 2px var(--focus); }
+  .reset-btn { border-style: solid; }
+  .reset-btn:hover, .reset-btn.confirm { border-color: var(--warn); color: var(--warn); background: var(--warn-bg); }
+  .add-btn:focus-visible, .reset-btn:focus-visible { box-shadow: 0 0 0 2px var(--focus); outline: none; }
 
-  footer {
-    font-size: 12px;
-    color: var(--text-muted);
-    text-align: center;
-    padding-top: 4px;
-  }
+  footer { font-size: 12px; color: var(--text-muted); text-align: center; padding-top: 4px; }
 
   @media (prefers-reduced-motion: reduce) {
-    .bar-seg-save { transition: none; }
+    .bar-seg-save, .expense-row { transition: none; }
   }
+
+  .settings {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .settings p { margin: 0; line-height: 1.5; }
+  .settings a { color: var(--accent); }
+  .settings-row { display: flex; gap: 8px; }
+  #tokenInput {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 13px;
+    padding: 8px 10px;
+    border-radius: 8px;
+  }
+  #tokenInput:focus-visible { box-shadow: 0 0 0 2px var(--focus); outline: none; }
+  .link-btn {
+    border: none;
+    background: none;
+    color: var(--text-muted);
+    font-family: "Work Sans", sans-serif;
+    font-size: 12px;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+  }
+  [hidden] { display: none !important; }
 </style>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-
+</head>
+<body>
 <div class="page">
   <header>
     <span class="eyebrow">Orçamento pessoal · mensal</span>
     <h1>Quanto sobra este mês</h1>
   </header>
+
+  <div class="sync">
+    <span class="sync-status busy" id="syncStatus"><span class="led"></span><span id="syncText">A ligar…</span></span>
+    <button class="sync-btn" id="syncBtn" type="button" hidden>↻ Carregar última versão</button>
+  </div>
+
+  <div class="settings" id="settings" hidden>
+    <p>Para sincronizar entre dispositivos, cola aqui um token do GitHub com a permissão <b>repo</b>. Só precisas de fazer isto uma vez em cada dispositivo. Os dados ficam no teu repositório privado <b>quanto-sobra-dados</b>.</p>
+    <p><a href="https://github.com/settings/tokens/new?scopes=repo&amp;description=quanto-sobra" target="_blank" rel="noopener">Criar token no GitHub</a> (em Expiration escolhe No expiration)</p>
+    <div class="settings-row">
+      <input type="password" id="tokenInput" placeholder="ghp_..." autocomplete="off">
+      <button class="sync-btn" id="tokenSave" type="button">Ligar</button>
+    </div>
+  </div>
 
   <div class="hero">
     <div class="hero-label">Poupança estimada</div>
@@ -341,6 +453,10 @@
     <div class="bar-legend">
       <span><span class="dot dot-save"></span>poupas</span>
       <span><span class="dot dot-spend"></span>gastas</span>
+    </div>
+    <div class="paid-summary">
+      <div><span class="k">Já pago</span><span class="v done" id="paidTotal">€ 0</span></div>
+      <div><span class="k">Falta pagar</span><span class="v" id="duePaid">€ 0</span></div>
     </div>
   </div>
 
@@ -356,82 +472,74 @@
       <span class="total" id="expenseTotal">€ 0</span>
     </div>
     <div id="expenses"></div>
-    <button class="add-btn" id="addRow" type="button">+ adicionar despesa</button>
+    <div class="card-actions">
+      <button class="add-btn" id="addRow" type="button">+ adicionar despesa</button>
+      <button class="reset-btn" id="resetPaid" type="button">Novo mês: desmarcar tudo</button>
+    </div>
   </section>
 
-  <footer>guardado automaticamente neste telemóvel</footer>
+  <footer id="footer">Toca no quadrado para marcar uma despesa como paga · <button class="link-btn" id="openSettings" type="button">sincronização</button></footer>
 </div>
 
 <script>
 (function () {
-  var STORAGE_KEY = "quanto-sobra-v1";
+  var LOCAL_KEY = "quanto-sobra-v2";
+  var TOKEN_KEY = "quanto-sobra-token";
+  var OWNER = "SofiaSilva1995";
+  var DATA_REPO = "quanto-sobra-dados";
+  var DATA_FILE = "dados.json";
+  var API = "https://api.github.com";
+
   var expensesEl = document.getElementById("expenses");
   var salaryEl = document.getElementById("salary");
-  var addRowBtn = document.getElementById("addRow");
   var heroFigure = document.getElementById("heroFigure");
   var heroSub = document.getElementById("heroSub");
   var expenseTotalEl = document.getElementById("expenseTotal");
+  var paidTotalEl = document.getElementById("paidTotal");
+  var dueEl = document.getElementById("duePaid");
   var barSave = document.getElementById("barSave");
   var barSpend = document.getElementById("barSpend");
+  var syncStatus = document.getElementById("syncStatus");
+  var syncText = document.getElementById("syncText");
+  var syncBtn = document.getElementById("syncBtn");
+  var resetBtn = document.getElementById("resetPaid");
+  var settingsEl = document.getElementById("settings");
+  var tokenInput = document.getElementById("tokenInput");
 
-  var defaultExpenses = [
-    { name: "Casa", value: 360 },
-    { name: "Carro", value: 377 },
-    { name: "Gasóleo + portagens", value: 250 },
-    { name: "Spotify", value: 17 },
-    { name: "Barbeiro", value: 20 },
-    { name: "Cofre conjunto Sofia", value: 100 },
-    { name: "Vila", value: 100 },
-    { name: "Dinheiro para o mês", value: 100 }
-  ];
+  var defaultState = {
+    salary: 0,
+    rows: [
+      { name: "Casa", value: 360, paid: false },
+      { name: "Carro", value: 377, paid: false },
+      { name: "Gasóleo + portagens", value: 250, paid: false },
+      { name: "Spotify", value: 17, paid: false },
+      { name: "Barbeiro", value: 20, paid: false },
+      { name: "Cofre conjunto Sofia", value: 100, paid: false },
+      { name: "Vila", value: 100, paid: false },
+      { name: "Dinheiro para o mês", value: 100, paid: false }
+    ],
+    updatedAt: 0
+  };
 
   var rowSeq = 0;
+  var token = null;
+  var sha = null;          // versao do ficheiro no GitHub que este dispositivo conhece
+  var saveTimer = null;
+  var saving = false;
+  var saveAgain = false;
+  var dirty = false;
+  var conflict = false;
+
+  var CHECK_SVG = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
   function money(n) {
     return "€ " + n.toLocaleString("pt-PT", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
   }
 
-  function loadState() {
-    try {
-      var raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return null;
-      return JSON.parse(raw);
-    } catch (e) { return null; }
-  }
-
-  function saveState() {
-    try {
-      var rows = Array.prototype.slice.call(expensesEl.querySelectorAll(".expense-row")).map(function (row) {
-        return {
-          name: row.querySelector('input[type="text"]').value,
-          value: parseFloat(row.querySelector('input[type="number"]').value) || 0
-        };
-      });
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        salary: parseFloat(salaryEl.value) || 0,
-        rows: rows
-      }));
-    } catch (e) { /* localStorage indisponível, ignora */ }
-  }
-
-  function addRow(name, value) {
-    rowSeq += 1;
-    var id = "exp-" + rowSeq;
-    var row = document.createElement("div");
-    row.className = "expense-row";
-    row.innerHTML =
-      '<input type="text" id="' + id + '-name" value="' + escapeHtml(name || "") + '" placeholder="nome da despesa">' +
-      '<div class="value-wrap"><span>€</span><input type="number" id="' + id + '-value" value="' + (value || "") + '" min="0" step="1" inputmode="decimal"></div>' +
-      '<button class="remove-btn" type="button" aria-label="remover despesa">×</button>';
-
-    row.querySelector(".remove-btn").addEventListener("click", function () {
-      row.remove();
-      recalc();
-    });
-    row.querySelectorAll("input").forEach(function (inp) {
-      inp.addEventListener("input", recalc);
-    });
-    expensesEl.appendChild(row);
+  function when(ts) {
+    var d = new Date(ts);
+    return d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit" }) + " às " +
+      d.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
   }
 
   function escapeHtml(s) {
@@ -440,14 +548,75 @@
     });
   }
 
+  function setStatus(kind, text) {
+    syncStatus.className = "sync-status " + kind;
+    syncText.textContent = text;
+  }
+
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+
+  // ---------- estado <-> DOM ----------
+
+  function readState() {
+    var rows = Array.prototype.slice.call(expensesEl.querySelectorAll(".expense-row")).map(function (row) {
+      return {
+        name: row.querySelector('input[type="text"]').value,
+        value: parseFloat(row.querySelector('input[type="number"]').value) || 0,
+        paid: row.classList.contains("paid")
+      };
+    });
+    return { salary: parseFloat(salaryEl.value) || 0, rows: rows };
+  }
+
+  function addRow(r) {
+    rowSeq += 1;
+    var id = "exp-" + rowSeq;
+    var row = document.createElement("div");
+    row.className = "expense-row" + (r.paid ? " paid" : "");
+    row.innerHTML =
+      '<button class="check" type="button" id="' + id + '-paid" aria-pressed="' + (r.paid ? "true" : "false") + '" aria-label="marcar como paga">' + CHECK_SVG + '</button>' +
+      '<input type="text" id="' + id + '-name" value="' + escapeHtml(r.name || "") + '" placeholder="nome da despesa">' +
+      '<div class="value-wrap"><span>€</span><input type="number" id="' + id + '-value" value="' + (r.value || "") + '" min="0" step="1" inputmode="decimal"></div>' +
+      '<button class="remove-btn" type="button" aria-label="remover despesa">×</button>';
+
+    var check = row.querySelector(".check");
+    check.addEventListener("click", function () {
+      var on = row.classList.toggle("paid");
+      check.setAttribute("aria-pressed", on ? "true" : "false");
+      changed(true);
+    });
+    row.querySelector(".remove-btn").addEventListener("click", function () {
+      row.remove();
+      changed(true);
+    });
+    row.querySelectorAll("input").forEach(function (inp) {
+      inp.addEventListener("input", function () { changed(false); });
+    });
+    expensesEl.appendChild(row);
+  }
+
+  function render(state) {
+    expensesEl.innerHTML = "";
+    rowSeq = 0;
+    (state.rows || []).forEach(addRow);
+    salaryEl.value = state.salary ? state.salary : "";
+    recalc();
+  }
+
   function recalc() {
-    var total = 0;
-    expensesEl.querySelectorAll(".expense-row").forEach(function (row) {
-      total += parseFloat(row.querySelector('input[type="number"]').value) || 0;
+    var s = readState();
+    var total = 0, paid = 0;
+    s.rows.forEach(function (r) {
+      total += r.value;
+      if (r.paid) paid += r.value;
     });
     expenseTotalEl.textContent = money(total);
+    paidTotalEl.textContent = money(paid);
+    dueEl.textContent = money(total - paid);
 
-    var salary = parseFloat(salaryEl.value);
+    var salary = s.salary;
     if (!salary || salary <= 0) {
       heroFigure.textContent = "Introduz o ordenado abaixo";
       heroFigure.classList.add("empty");
@@ -455,7 +624,6 @@
       heroSub.textContent = "";
       barSave.style.flexBasis = "0%";
       barSpend.style.flexBasis = "100%";
-      saveState();
       return;
     }
 
@@ -477,23 +645,209 @@
       barSave.style.flexBasis = pct + "%";
       barSpend.style.flexBasis = spendPct + "%";
     }
-
-    saveState();
   }
 
-  addRowBtn.addEventListener("click", function () {
-    addRow("", "");
+  // ---------- GitHub ----------
+
+  function b64encode(str) { return btoa(unescape(encodeURIComponent(str))); }
+  function b64decode(str) { return decodeURIComponent(escape(atob(str.replace(/\n/g, "")))); }
+
+  function gh(method, path, body) {
+    return fetch(API + path, {
+      method: method,
+      cache: "no-store",
+      headers: {
+        "Authorization": "Bearer " + token,
+        "Accept": "application/vnd.github+json"
+      },
+      body: body ? JSON.stringify(body) : undefined
+    });
+  }
+
+  function ensureRepo() {
+    return gh("GET", "/repos/" + OWNER + "/" + DATA_REPO).then(function (r) {
+      if (r.ok) return;
+      if (r.status === 401) throw { code: "auth" };
+      if (r.status !== 404) throw { code: "net" };
+      return gh("POST", "/user/repos", {
+        name: DATA_REPO, private: true, auto_init: true,
+        description: "Dados do Quanto Sobra (privado)"
+      }).then(function (c) { if (!c.ok) throw { code: c.status === 401 ? "auth" : "create" }; });
+    });
+  }
+
+  function fetchRemote() {
+    return gh("GET", "/repos/" + OWNER + "/" + DATA_REPO + "/contents/" + DATA_FILE + "?t=" + Date.now()).then(function (r) {
+      if (r.status === 404) return null;
+      if (r.status === 401) throw { code: "auth" };
+      if (!r.ok) throw { code: "net" };
+      return r.json().then(function (j) {
+        return { sha: j.sha, data: JSON.parse(b64decode(j.content)) };
+      });
+    });
+  }
+
+  function applyRemote(remote) {
+    sha = remote.sha;
+    dirty = false;
+    conflict = false;
+    render(remote.data);
+    lsSet(LOCAL_KEY, JSON.stringify(remote.data));
+    setStatus("ok", "Última versão · " + when(remote.data.updatedAt || Date.now()));
+  }
+
+  function loadLatest() {
+    if (!token) return Promise.resolve();
+    clearTimeout(saveTimer);
+    syncBtn.disabled = true;
+    setStatus("busy", "A carregar…");
+    return fetchRemote().then(function (remote) {
+      if (remote) applyRemote(remote);
+      else { sha = null; pushRemote(); }
+    }).catch(handleError).then(function () { syncBtn.disabled = false; });
+  }
+
+  function pushRemote() {
+    if (!token || conflict) return;
+    if (saving) { saveAgain = true; return; }
+    saving = true;
+    var s = readState();
+    s.updatedAt = Date.now();
+    var body = { message: "atualiza " + new Date(s.updatedAt).toISOString(), content: b64encode(JSON.stringify(s, null, 2)) };
+    if (sha) body.sha = sha;
+    setStatus("busy", "A guardar…");
+    gh("PUT", "/repos/" + OWNER + "/" + DATA_REPO + "/contents/" + DATA_FILE, body).then(function (r) {
+      if (r.status === 409 || r.status === 422) {
+        conflict = true;
+        setStatus("stale", "Mudaste noutro dispositivo. Carrega em ↻ para ver a última versão.");
+        return;
+      }
+      if (r.status === 401) throw { code: "auth" };
+      if (!r.ok) throw { code: "net" };
+      return r.json().then(function (j) {
+        sha = j.content.sha;
+        dirty = false;
+        setStatus("ok", "Guardado " + when(s.updatedAt));
+      });
+    }).catch(handleError).then(function () {
+      saving = false;
+      if (saveAgain) { saveAgain = false; pushRemote(); }
+    });
+  }
+
+  function handleError(e) {
+    if (e && e.code === "auth") {
+      setStatus("stale", "Token inválido ou expirado. Liga outra vez.");
+      token = null;
+      lsDel(TOKEN_KEY);
+      syncBtn.hidden = true;
+      settingsEl.hidden = false;
+    } else if (e && e.code === "create") {
+      setStatus("stale", "Não consegui criar o repositório privado. O token precisa da permissão repo.");
+    } else {
+      setStatus("stale", "Sem ligação. Guardado neste dispositivo; tenta ↻ mais tarde.");
+    }
+  }
+
+  // ---------- alterações ----------
+
+  function changed(immediate) {
     recalc();
-  });
-  salaryEl.addEventListener("input", recalc);
-
-  var saved = loadState();
-  if (saved && saved.rows && saved.rows.length) {
-    saved.rows.forEach(function (r) { addRow(r.name, r.value); });
-    if (saved.salary) salaryEl.value = saved.salary;
-  } else {
-    defaultExpenses.forEach(function (r) { addRow(r.name, r.value); });
+    dirty = true;
+    var s = readState();
+    s.updatedAt = Date.now();
+    lsSet(LOCAL_KEY, JSON.stringify(s));
+    if (!token) return;
+    if (conflict) {
+      setStatus("stale", "Mudaste noutro dispositivo. Carrega em ↻ para ver a última versão.");
+      return;
+    }
+    setStatus("busy", "A guardar…");
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(pushRemote, immediate ? 300 : 1200);
   }
-  recalc();
+
+  document.getElementById("addRow").addEventListener("click", function () {
+    addRow({ name: "", value: "", paid: false });
+    changed(true);
+    var inputs = expensesEl.querySelectorAll('input[type="text"]');
+    inputs[inputs.length - 1].focus();
+  });
+
+  salaryEl.addEventListener("input", function () { changed(false); });
+
+  var resetArmed = null;
+  resetBtn.addEventListener("click", function () {
+    if (!resetArmed) {
+      resetBtn.classList.add("confirm");
+      resetBtn.textContent = "Tens a certeza? Toca outra vez";
+      resetArmed = setTimeout(disarm, 4000);
+      return;
+    }
+    disarm();
+    expensesEl.querySelectorAll(".expense-row.paid").forEach(function (row) {
+      row.classList.remove("paid");
+      row.querySelector(".check").setAttribute("aria-pressed", "false");
+    });
+    changed(true);
+  });
+  function disarm() {
+    clearTimeout(resetArmed);
+    resetArmed = null;
+    resetBtn.classList.remove("confirm");
+    resetBtn.textContent = "Novo mês: desmarcar tudo";
+  }
+
+  syncBtn.addEventListener("click", loadLatest);
+
+  document.getElementById("openSettings").addEventListener("click", function () {
+    settingsEl.hidden = !settingsEl.hidden;
+  });
+
+  document.getElementById("tokenSave").addEventListener("click", function () {
+    var t = tokenInput.value.trim();
+    if (!t) return;
+    token = t;
+    setStatus("busy", "A ligar…");
+    ensureRepo().then(function () {
+      lsSet(TOKEN_KEY, t);
+      tokenInput.value = "";
+      settingsEl.hidden = true;
+      syncBtn.hidden = false;
+      return loadLatest();
+    }).catch(handleError);
+  });
+
+  // Quando voltas a abrir a app (ex: telemovel), vai buscar a ultima versao
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible" && token && !dirty && !saving) loadLatest();
+  });
+
+  // ---------- arranque ----------
+
+  var local = null;
+  try {
+    var raw = lsGet(LOCAL_KEY);
+    if (raw) local = JSON.parse(raw);
+    else {
+      var old = lsGet("quanto-sobra-v1");
+      if (old) {
+        var o = JSON.parse(old);
+        local = { salary: o.salary || 0, rows: (o.rows || []).map(function (r) { return { name: r.name, value: r.value, paid: false }; }) };
+      }
+    }
+  } catch (e) {}
+  render(local || defaultState);
+
+  token = lsGet(TOKEN_KEY);
+  if (token) {
+    syncBtn.hidden = false;
+    loadLatest();
+  } else {
+    setStatus("", "Só neste dispositivo");
+    settingsEl.hidden = false;
+  }
 })();
 </script>
+</body>
+</html>
